@@ -46,7 +46,7 @@ async def help_command(update: Update, context: CallbackContext) -> None:
 
 
 # Chat with ai
-async def echo(update: Update, context: CallbackContext) -> None:
+async def handle_chat(update: Update, context: CallbackContext) -> None:
     try:
         user = update.effective_user
         if user.id not in chat_history:
@@ -88,11 +88,11 @@ async def echo(update: Update, context: CallbackContext) -> None:
             chat_history[user.id].append(responseMessage)
             response_text = result["message"]["content"]
         else:
-            response_text = "Sorry, I couldn't predict the disease. Please try again."
+            response_text = "Sorry, I couldn't reply. Please try again."
 
     except requests.exceptions.RequestException as e:
-        logger.error(f"Error while contacting FastAPI: {e}")
-        response_text = "Sorry, there was an error with the prediction service."
+        logger.error(f"Error while contacting AI: {e}")
+        response_text = "Sorry, there was an error with the chat service."
 
     await update.message.reply_text(response_text)
 
@@ -144,7 +144,7 @@ def main():
     application.add_handler(CommandHandler("help", help_command))
 
     # message handlers
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_chat))
     application.add_handler(MessageHandler(filters.PHOTO, handle_image))
 
     logger.info("Starting Telegram bot...")
